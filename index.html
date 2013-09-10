@@ -1,0 +1,88 @@
+<!doctype html>
+<html
+	data-ng-app="rye"
+	data-ng-controller="Controller">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		
+		<title>Rye</title>
+		<link rel="stylesheet" href="css/rye.css">
+		
+		<script src="angular.js"></script>
+		<script src="when.js"></script>
+		<script src="domparser.js"></script>
+		<script src="rye.js"></script>
+		<script src="https://www.google.com/jsapi"></script>
+		<!-- Load the Feed API here because the loader seems to use `document.write` or some form of DOM manipulation. -->
+		<script>google.load('feeds', '1');</script>
+		<script src="Library.js"></script>
+		<script src="Podcast.js"></script>
+	</head>
+	<body>
+		<header>
+			<h1>Rye</h1>
+		</header>
+		<div id="player">
+			<h2
+				class="episode-title"
+				data-ng-if="selected.episode"
+				data-ng-click="selectPodcast(selected.episode.podcast)">{{selected.episode.title}}</h2>
+			<h2 class="episode-title" data-ng-if="!selected.episode">No episode selected</h2>
+			<h3
+				class="podcast-title"
+				data-ng-if="selected.episode"
+				data-ng-click="selectPodcast(selected.episode.podcast)">{{selected.episode.podcast.title}}</h3>
+			<h3 class="podcast-title" data-ng-if="!selected.episode">No podcast selected</h3>
+			<podcast-player data-ng-model="selected.episode"></podcast-player>
+		</div>
+		<div class="library">
+			<div class="podcast-menu">
+				<ul class="podcast-list">
+					<li data-ng-repeat="podcast in library.podcasts">
+						<button
+							data-ng-click="selectPodcast(podcast)"
+							data-ng-class="{
+								selected: podcast == selected.podcast,
+								new: podcast.hasNewEpisodes
+							}">{{podcast.title}}</button>
+					</li>
+				</ul>
+				<form id="add-podcast">
+					<input
+						type="text"
+						placeholder="Add podcast by URL"
+						data-ng-model="newPodcast.url">
+					<button
+						type="submit"
+						data-ng-click="addPodcast(newPodcast.url)">Add Podcast</button>
+				</form>
+			</div>
+			<ul
+				class="podcast-detail"
+				data-ng-repeat="podcast in library.podcasts"
+				data-ng-show="podcast == selected.podcast">
+				<ul id="episode-list">
+					<li data-ng-repeat="episode in podcast.episodes">
+						<div
+							data-ng-click="selectEpisode(episode)"
+							data-ng-class="{
+								selected: episode == selected.episode,
+								new: episode.isNew,
+								old: episode.isOld
+							}">
+							<header>
+								<h3>{{episode.title}}</h3>
+								<p class="duration">{{episode.duration | duration}}</p>
+								<meter value="{{episode.progress}}"></meter>
+							</header>
+							<article class="description">
+								<p data-ng-if="episode.description">{{episode.description}}</p>
+							</article>
+						</div>
+					</li>
+				</ul>
+			</ul>
+		</div>
+	</body>
+</html>
